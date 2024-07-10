@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Email Messages</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div id="progress_bar" style="width: 0%; height: 30px; background-color: #4CAF50;"></div>
+    <table id="email_messages_table">
+        <thead>
+            <tr>
+                <th>Subject</th>
+                <th>Sent Date</th>
+                <th>Received Date</th>
+                <th>Description</th>
+                <th>Attachments</th>
+            </tr>
+        </thead>
+        <tbody></tbody>
+    </table>
+
+    <script>
+        let last_message_id = 0;
+let messages_count = 0;
+
+function update_messages() {
+    $.ajax({
+        url: '/get_messages/',
+        data: {
+            last_id: last_message_id
+        },
+        success: function (data) {
+            messages_count += data.length;
+
+            // Update the progress bar
+            let progress_bar = $('#progress_bar');
+            let progress_bar_width = function () {
+                let checked_messages = last_message_id + data.length;
+                return (checked_messages / messages_count) * 100;
+            };
+
+            // Process messages
+            data.forEach(function (message) {
+                last_message_id = message.id;
+
+                // Update the progress bar
+                progress_bar.css('width', progress_bar_width() + '%');
+
+                // Add a new row to the table
+                $('#email_messages_table tbody').append(`
+                    <tr>
+                        <td>${message.subject}</td>
+                        <td>${message.sent_date}</td>
+                        <td>${message.received_date}</td>
+                        <td>${message.description}</td>
+                        <td>${message.attachments}</td>
+                    </tr>
+                `);
+            });
+        },
+        complete: function () {
+            // Call update_messages again after 5 seconds (5000 milliseconds)
+            setTimeout(update_messages, 5000);
+        }
+    });
+}
+
+// Call update_messages for the first time
+update_messages();
+    </script>
+</body>
+</html>
