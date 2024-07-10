@@ -27,9 +27,9 @@ class EmailCredentialsUserManager(BaseUserManager):
 class EmailCredentialsTest(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField('email address', unique=True)
     password = models.CharField('password', max_length=255)
-    is_staff = models.BooleanField('staff status', default=False)
-    is_active = models.BooleanField('active', default=True)
-    date_joined = models.DateTimeField('date joined', default=timezone.now)
+    is_staff = models.BooleanField('staff status', default=False, blank=True)  # Добавлено blank=True
+    is_active = models.BooleanField('active', default=True, blank=True)  # Добавлено blank=True
+    date_joined = models.DateTimeField('date joined', default=timezone.now, blank=True)  # Добавлено blank=True
 
     objects = EmailCredentialsUserManager()
 
@@ -61,7 +61,7 @@ class EmailMessageTest(models.Model):
     sent_date = models.DateTimeField()
     received_date = models.DateTimeField(default=timezone.now)
     description = models.TextField()
-    attachments = models.TextField(blank=True)
+    attachments = models.TextField(default='')
 
     def __str__(self):
         return self.subject
